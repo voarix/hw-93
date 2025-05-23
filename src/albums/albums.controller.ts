@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -49,5 +50,11 @@ export class AlbumsController {
       image: file ? '/uploads/albums/' + file.filename : null,
     });
     return album.save();
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    await this.albumModel.findByIdAndDelete(id);
+    return { message: 'Album was deleted successfully' };
   }
 }
