@@ -13,6 +13,7 @@ import { Model } from 'mongoose';
 import { Artist, ArtistDocument } from '../schemas/artist.schema';
 import { CreateArtistDto } from './create.artist.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { artistImage } from '../middleware/multer';
 
 @Controller('artists')
 export class ArtistsController {
@@ -31,9 +32,7 @@ export class ArtistsController {
   }
 
   @Post()
-  @UseInterceptors(
-    FileInterceptor('image', { dest: './public/uploads/artists' }),
-  )
+  @UseInterceptors(FileInterceptor('image', { storage: artistImage }))
   create(
     @UploadedFile() file: Express.Multer.File,
     @Body() createArtistDto: CreateArtistDto,
