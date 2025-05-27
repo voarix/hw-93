@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -20,11 +22,28 @@ export class UsersController {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   @Post()
-  register(@Body() registerUserDto: RegisterUserDto) {
+  async register(@Body() registerUserDto: RegisterUserDto) {
+    const { email, displayName, password } = registerUserDto;
+
+    if (!email) {
+      throw new BadRequestException('Email must be in req');
+    }
+    if (!displayName) {
+      throw new BadRequestException('Display name must be in req');
+    }
+    if (!password) {
+      throw new BadRequestException('Password must be in req');
+    }
+
+    const existUser = await this.userModel.findOne({ email });
+    if (existUser) {
+      throw new ConflictException('Such user already exists');
+    }
+
     const user = new this.userModel({
-      email: registerUserDto.email,
-      displayName: registerUserDto.displayName,
-      password: registerUserDto.password,
+      email: email,
+      displayName: displayName,
+      password: password,
     });
     user.generateToken();
     return user.save();
