@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTrackDto } from './create.track.dto';
@@ -11,18 +19,17 @@ export class TracksController {
   ) {}
 
   @Get()
-  getAll() {
-    return this.trackModel.find();
+  getAll(@Query('albumId') albumId?: string) {
+    const findQuery: { album?: string } = {};
+    if (albumId) {
+      findQuery.album = albumId;
+    }
+    return this.trackModel.find(findQuery);
   }
 
   @Get(':id')
   getOne(@Param('id') id: string) {
     return this.trackModel.find({ _id: id });
-  }
-
-  @Get('album/:albumId')
-  getAlbumsByArtist(@Param('albumId') albumId: string) {
-    return this.trackModel.find({ album: albumId });
   }
 
   @Post()
